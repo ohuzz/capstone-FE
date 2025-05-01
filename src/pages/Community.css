@@ -1,0 +1,123 @@
+/* 전체 페이지 컨테이너 */
+.community-page {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* 1) 검색·필터·정렬 래퍼: filter-bar + sort-bar */
+.search-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* -- 1-1) 드롭다운 + 검색 버튼 그룹 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  padding: 8px 16px;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 15px;
+}
+
+/* 필터용 select 공통 스타일 */
+.filter-bar select {
+  padding: 6px 12px;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+/* 검색 버튼 */
+.filter-bar .search-btn {
+  padding: 6px 16px;
+  background: #D0E8FD;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* -- 1-2) 정렬·보기 개수 그룹 */
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sort-bar select {
+  padding: 6px 12px;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* 게시글 테이블 */
+.posts-table {
+  width: 100%;
+  margin-top: 5px;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.posts-table th,
+.posts-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.posts-table th {
+  background: #ffecec;
+  font-weight: 500;
+}
+
+.posts-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+/* 페이징 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 20px 0;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #D0E8FD;
+}
+
+/* 글쓰기 버튼 */
+.write-post-btn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.write-post-btn button {
+  padding: 8px 16px;
+  border-radius: 20px;
+}
