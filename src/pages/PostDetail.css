@@ -79,6 +79,22 @@
   color: #333;
 }
 
+/* 해쉬태그 */
+.hashtags {
+  padding: 0 24px;
+  margin: 12px 0;
+}
+
+.hashtag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 4px 8px;
+  background: #e0f3ff;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0077cc;
+}
+
 /* 좋아요 버튼 */
 .post-actions {
   padding: 0 24px 24px;

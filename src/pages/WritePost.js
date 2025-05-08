@@ -37,14 +37,14 @@ function WritePost() {
     }, [previews]);
 
   // 엔터치면 태그 추가
-  const handleTagKeyUp = (e) => {
+  const handleTagKeyDown = (e) => {
     if (e.key !== 'Enter') return;
     if (e.nativeEvent.isComposing) return;
 
+    e.preventDefault();
     const val = tagInput.trim();
     if (!val) return;
 
-    e.preventDefault();
     setTags(prev => [...prev, val]);
     setTagInput('');
   };
@@ -78,14 +78,14 @@ function WritePost() {
 
     try {
       const response = await baseAPI.post(
-        '/api/posts',
+        '/v2/community/posts',
         formData,
-        { requiresAuth: true,
-          headers: {
-          'Content-Type': 'multipart/form-data'
-          }
-        }                
-      // ② requiresAuth 플래그만 추가
+      //   { requiresAuth: true,
+      //     // headers: {
+      //     // 'Content-Type': 'multipart/form-data'
+      //     // }
+      //   }                
+      // // ② requiresAuth 플래그만 추가
       );
       console.log('게시글 작성 성공:', response.data);
       navigate('/community');              
@@ -193,7 +193,7 @@ function WritePost() {
           placeholder="#태그를 입력해주세요 (엔터하면 자동생성)"
           value={tagInput}
           onChange={e => setTagInput(e.target.value)}
-          onKeyUp={handleTagKeyUp}
+          onKeyDown={handleTagKeyDown}
         />
         <div className="tags-list">
           {tags.map((t, i) => (

@@ -75,6 +75,14 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
+.posts-table tbody tr.clickable-row {
+  cursor: pointer;
+}
+
+.posts-table tbody tr.clickable-row:hover {
+  background-color: rgb(226, 222, 222);
+}
+
 .posts-table th,
 .posts-table td {
   padding: 12px;

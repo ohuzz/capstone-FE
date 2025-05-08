@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback} from 'react';
+// import axios from 'axios';
+import { baseAPI } from '../apis/instance';
+import { Link, useNavigate } from 'react-router-dom';
 import './Community.css';
+
+const categoryMap = {
+  ALOPECIA_AREATA: '원형탈모', 
+  HAIR_TRANSPLANT: '모발이식',
+  HAIR_MEDICINE: '탈모약', 
+  HOSPITAL_QUESTION: '병원질문', 
+  FREE_TALK: '자유수다',
+};
 
 function Community() {
   // 필터 & 페이징 & 정렬 상태
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [category, setCategory] = useState('');  
   const [gender, setGender] = useState('');  
@@ -13,34 +23,49 @@ function Community() {
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState('createdDate.desc');
 
-  // 게시글 불러오기
-  const fetchPosts = async () => {
+// 마운트 및 필터/페이징/정렬 변경 시 다시 호출
+const fetchPosts = useCallback(async () => {
     try {
       const params = {
         category: category || undefined,
         gender: gender || undefined,
         page,
-        order: sort
-      };
-      if (transplantCount) {
-        const base = Number(transplantCount);
-        params.goe = base;
-        params.loe = base + 1000;
+        order: sort,
+        };
+        if (transplantCount) {
+          const base = Number(transplantCount);
+          params.goe = base;
+          params.loe = base + 1000;
+        }
+        const res = await baseAPI.get('/community/posts', { params });
+        // const data = (res.data.result?.content || []).map(p => ({
+        //   ...p,
+        //   category: categoryMap[p.category] || p.category,
+        // }));
+        // setPosts(data);
+        let data = (res.data.result?.content || []).map(p => ({
+          postId: p.postId,
+          category: categoryMap[p.category] || p.category,
+          title: p.title,
+          username: p.username,
+          date: p.date,
+          likes: p.likes,
+        }));
+        if (sort === 'likeCount.desc') {
+          data.sort((a, b) => b.likes - a.likes);
+        } else if (sort === 'createdDate.desc') {
+          data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        setPosts(data);
+        setTotalPages(res.data.result?.totalPages ?? 1);
+      } catch (err) {
+        console.error('게시글 목록 불러오기 실패', err);
       }
-      const res = await axios.get('/api/posts', { params });
-      const data = res.data.result?.content || [];
-      setPosts(data);
-      setTotalPages(res.data.result?.totalPages ?? 1);
-    } catch (err) {
-      console.error('게시글 목록 불러오기 실패', err);
-    }
-  };
+  }, [category, gender, transplantCount, page, sort]);
 
-  // 마운트 및 필터/페이징/정렬 변경 시 다시 호출
   useEffect(() => {
-    setPage(0);
     fetchPosts();
-  }, [category, gender, transplantCount, sort]);
+  }, [fetchPosts]);
 
   // 검색 버튼 클릭
   const handleSearch = () => {
@@ -59,7 +84,7 @@ function Community() {
           <option value="HAIR_MEDICINE">탈모약</option>
           <option value="HOSPITAL_QUESTION">병원질문</option>
           <option value="FREE_TALK">자유수다</option>
-        </select>
+          </select>
         <select value={gender} onChange={e => setGender(e.target.value)}>
           <option value="">성별</option>
           <option value="MALE">남성</option>
@@ -88,6 +113,7 @@ function Community() {
       <table className="posts-table">
         <thead>
           <tr>
+            <th>번호</th>
             <th>카테고리</th>
             <th>제목</th>
             <th>작성자</th>
@@ -97,13 +123,18 @@ function Community() {
         </thead>
         <tbody>
           {posts.length === 0 ? (
-            <tr><td colSpan="5">게시글이 없습니다.</td></tr>
+            <tr><td colSpan="6">게시글이 없습니다.</td></tr>
           ) : (
-            posts.map(post => (
-              <tr key={post.postId}>
+            posts.map((post, idx) => (
+              <tr 
+                key={post.postId}
+                className='clickable-row'
+                onClick={() => navigate(`/posts/${post.postId}`)}
+                >
+                <td>{idx + 1}</td>
                 <td>{post.category}</td>
                 <td>
-                  <Link to={`/posts/${post.postId}`}>{post.title} ({post.commentCount})</Link>
+                  <Link to={`/posts/${post.postId}`}>{post.title}</Link>
                 </td>
                 <td>{post.username}</td>
                 <td>{new Date(post.date).toLocaleDateString()}</td>
