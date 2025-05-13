@@ -80,11 +80,11 @@ function WritePost() {
       const response = await baseAPI.post(
         '/v2/community/posts',
         formData,
-      //   { requiresAuth: true,
-      //     // headers: {
-      //     // 'Content-Type': 'multipart/form-data'
-      //     // }
-      //   }                
+        { requiresAuth: true,
+           headers: {
+           'Content-Type': 'multipart/form-data'
+           }
+         }
       // // ② requiresAuth 플래그만 추가
       );
       console.log('게시글 작성 성공:', response.data);

@@ -30,14 +30,21 @@ if (jwtToken) {
     baseAPI.defaults.headers.common['Authorization'] = jwtToken;
 }
 
-// 4) 요청 인터셉터: 매 요청마다 최신 토큰을 헤더에 붙임
+
 baseAPI.interceptors.request.use(config => {
-    const token = getJwtToken();  // 메모리 또는 로컬스토리지에서 토큰 가져오기
+    const token = getJwtToken();
+    console.log('[Interceptor] getJwtToken →', token);
     if (token) {
-        config.headers['Authorization'] = token;  // 헤더에 Authorization 추가
+        console.log('[Interceptor] Setting header Authorization:', token);
+        // plain assignment
+        config.headers['Authorization'] = token;
+        // -- 또는 --
+        //config.headers.Authorization = token;
     }
     return config;
-}, error => Promise.reject(error));
+});
+
+
 
 // 5) (선택) 토큰 검증/갱신/로그아웃 유틸
 export const checkJwtToken = async () => {
