@@ -1,3 +1,6 @@
+/* PostDetail.css */
+
+/* 전체 컨테이너 최대 너비 */
 .post-detail {
   max-width: 800px;
   margin: 40px auto;
@@ -7,21 +10,31 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 이미지 렌더링 */
+/* 이미지 렌더링 영역 */
+.post-content {
+  padding: 24px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* 이미지 리스트가 따로 있을 경우 사용 */
 .post-images {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 12px;
   padding: 16px 24px;
   background: #fafafa;
   border-bottom: 1px solid #eee;
 }
-.post-img {
-  width: 120px;
-  height: 120px;
+
+/* 이미지 공통 스타일 (조금 더 큰 썸네일) */
+.post-images .post-img {
+  width: 100px;            /* 기존 120px에서 살짝 키움 */
+  height: 80px;
   object-fit: cover;
   border-radius: 4px;
   border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* 제목 및 작성일 */
@@ -72,19 +85,11 @@
   color: #f4b400;
 }
 
-/* 본문 */
-.post-content {
-  padding: 24px;
-  line-height: 1.6;
-  color: #333;
-}
-
 /* 해쉬태그 */
 .hashtags {
   padding: 0 24px;
   margin: 12px 0;
 }
-
 .hashtag {
   display: inline-block;
   margin-right: 8px;
@@ -183,4 +188,3 @@
   border-radius: 20px;
   cursor: pointer;
 }
-

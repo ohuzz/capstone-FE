@@ -3,15 +3,13 @@ import { useParams } from 'react-router-dom';
 import { baseAPI } from '../apis/instance';
 import './PostDetail.css';
 
-// 한글 매핑
-const GENDER_MAP = { MALE: '남성', FEMALE: '여성' };
-
 function PostDetail() {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const uploadBase = process.env.REACT_APP_BASE_URL; // e.g. http://localhost:8080
 
-  // 상세 + 댓글 한 번에 불러오기
+  // 상세 정보 + 댓글 + 해시태그 + 이미지 조회
   useEffect(() => {
     async function fetchDetail() {
       try {
@@ -24,17 +22,11 @@ function PostDetail() {
     fetchDetail();
   }, [postId]);
 
-  // 좋아요 등록
+  // 좋아요
   const handleLike = async () => {
     try {
-      const res = await baseAPI.post(
-          `/community/posts/${postId}/likes`,
-          {}
-      );
-      setPost(prev => ({
-        ...prev,
-        likeCount: res.data.result.likeCount
-      }));
+      const res = await baseAPI.post(`/community/posts/${postId}/likes`, {});
+      setPost(prev => ({ ...prev, likeCount: res.data.result.likeCount }));
     } catch (err) {
       console.error('좋아요 실패', err);
     }
@@ -46,7 +38,7 @@ function PostDetail() {
     if (!newComment.trim()) return;
     try {
       const res = await baseAPI.post(
-          `/community/posts/${postId}/comments`, // 엔드포인트가 다르면 수정
+          `/community/posts/${postId}/comments`,
           { content: newComment }
       );
       setPost(prev => ({
@@ -74,30 +66,42 @@ function PostDetail() {
         {/* 메타 정보 */}
         <div className="post-meta">
           <div className="meta-box">카테고리: {post.category}</div>
-          <div className="meta-box">성별: {GENDER_MAP[post.gender] || '-'}</div>
-          <div className="meta-box">경과: {post.sergeryProgress || post.surgeryProgress}</div>
-          <div className="meta-box">이식량: {post.transplantAmount || post.transplantCount}모</div>
+          <div className="meta-box">성별: {post.gender}</div>
+          <div className="meta-box">경과: {post.sergeryProgress}</div>
+          <div className="meta-box">이식량: {post.transplantAmount}모</div>
           <div className="meta-box rating">
             만족도:&nbsp;
             {[1,2,3,4,5].map(n => (
-                <span key={n} className={`star ${n <= (post.satisfactionLevel || post.satisfactionScore) ? 'on' : ''}`}>
-              ★
-            </span>
+                <span
+                    key={n}
+                    className={`star ${n <= post.satisfactionLevel ? 'on' : ''}`}
+                >★</span>
             ))}
           </div>
         </div>
 
         {/* 본문 + 이미지 */}
         <div className="post-content">
-          {post.content.split('\n').map((line, i) => (
-              <p key={i}>{line}</p>
+          {post.content.split('\n').map((line, idx) => (
+              <p key={idx}>{line}</p>
           ))}
-          {/* backend returns fileNames[] */}
-          {(post.fileNames || []).map((filename, i) => (
+
+          {/* fileNames fallback */}
+          {(post.fileNames || []).map((filename, idx) => (
               <img
-                  key={i}
-                  src={`${process.env.REACT_APP_BASE_URL}/uploads/${filename}`}
+                  key={`fileName-${idx}`}
+                  src={`${uploadBase}/uploads/${filename}`}
                   alt={filename}
+                  className="post-img"
+              />
+          ))}
+
+          {/* postImages */}
+          {(post.postImages || []).map((img, idx) => (
+              <img
+                  key={`postImage-${idx}`}
+                  src={`${uploadBase}/uploads/${img.uuidFilename}`}
+                  alt={img.originalFilename}
                   className="post-img"
               />
           ))}
@@ -112,10 +116,8 @@ function PostDetail() {
 
         {/* 해시태그 */}
         <div className="hashtags">
-          {(post.hashtags || []).map(tag => (
-              <span key={tag} className="hashtag">
-            #{tag}
-          </span>
+          {post.hashTags?.map(tag => (
+              <span key={tag} className="hashtag">#{tag}</span>
           ))}
         </div>
 
@@ -123,8 +125,8 @@ function PostDetail() {
         <div className="comments-section">
           <h3>댓글 ({post.comments?.length || 0})</h3>
           <ul className="comments-list">
-            {(post.comments || []).map(c => (
-                <li key={c.commentId || c.id} className="comment-item">
+            {post.comments?.map((c, idx) => (
+                <li key={idx} className="comment-item">
                   <div className="avatar">{c.username.charAt(0)}</div>
                   <div className="comment-body">
                     <div className="comment-header">
