@@ -1,0 +1,159 @@
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { login } from "../../../apis/authService"; // authService 경로는 환경에 맞게 조정하세요
+
+// @mui material components
+import Card from "@mui/material/Card";
+import Grid from "@mui/material/Grid";
+import MuiLink from "@mui/material/Link";
+
+// @mui icons
+import GoogleIcon from "@mui/icons-material/Google";
+
+// Material Kit 2 React components
+import MKBox from "components/MKBox";
+import MKTypography from "components/MKTypography";
+import MKInput from "components/MKInput";
+import MKButton from "components/MKButton";
+
+// Material Kit 2 React example components
+import DefaultNavbar from "examples/Navbars/DefaultNavbar";
+import SimpleFooter from "examples/Footers/SimpleFooter";
+
+// Material Kit 2 React page layout routes
+import routes from "routes";
+
+// Images
+import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+
+function SignInBasic() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login({ username, password });
+      // 로그인 성공 시, 토큰이 localStorage 등에 저장되었다고 가정
+      console.log("로그인 성공, 받은 헤더 토큰:", localStorage.getItem("accessToken"));
+      navigate("/writepost");
+    } catch (err) {
+      console.error("로그인 실패:", err);
+      alert("로그인에 실패했습니다.");
+    }
+  };
+
+  return (
+    <>
+      <DefaultNavbar
+        routes={routes}
+        action={{
+          type: "internal",
+          route: "/authentication/sign-in",
+          label: "sign-in",
+          color: "info",
+        }}
+        transparent
+        light
+      />
+      <MKBox
+        position="absolute"
+        top={0}
+        left={0}
+        zIndex={1}
+        width="100%"
+        minHeight="100vh"
+        sx={{
+          backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
+            `${linearGradient(
+              rgba(gradients.dark.main, 0.6),
+              rgba(gradients.dark.state, 0.6)
+            )}, url(${bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      <MKBox px={1} width="100%" height="100vh" mx="auto" position="relative" zIndex={2}>
+        <Grid container spacing={1} justifyContent="center" alignItems="center" height="100%">
+          <Grid item xs={11} sm={9} md={5} lg={4} xl={3}>
+            <Card>
+              <MKBox
+                variant="gradient"
+                bgColor="info"
+                borderRadius="lg"
+                coloredShadow="info"
+                mx={2}
+                mt={-3}
+                p={2}
+                mb={1}
+                textAlign="center"
+              >
+                <MKTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+                  Sign in
+                </MKTypography>
+                <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
+                  <Grid item xs={2}>
+                    <MKTypography component={MuiLink} href="#" variant="body1" color="white">
+                      <GoogleIcon color="inherit" />
+                    </MKTypography>
+                  </Grid>
+                </Grid>
+              </MKBox>
+              <MKBox pt={4} pb={3} px={3}>
+                {/* 로그인 핸들러 연결 */}
+                <MKBox component="form" role="form" onSubmit={handleSubmit}>
+                  <MKBox mb={2}>
+                    <MKInput
+                      type="text"
+                      label="Id"
+                      fullWidth
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </MKBox>
+                  <MKBox mb={2}>
+                    <MKInput
+                      type="password"
+                      label="Password"
+                      fullWidth
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </MKBox>
+                  <MKBox mt={4} mb={1}>
+                    {/* type="submit" 붙여야 onSubmit이 동작합니다 */}
+                    <MKButton variant="gradient" color="info" fullWidth type="submit">
+                      sign in
+                    </MKButton>
+                  </MKBox>
+                  <MKBox mt={3} mb={1} textAlign="center">
+                    <MKTypography variant="button" color="text">
+                      Don&apos;t have an account?{" "}
+                      <MKTypography
+                        component={Link}
+                        to="/authentication/sign-up"
+                        variant="button"
+                        color="info"
+                        fontWeight="medium"
+                        textGradient
+                      >
+                        Sign up
+                      </MKTypography>
+                    </MKTypography>
+                  </MKBox>
+                </MKBox>
+              </MKBox>
+            </Card>
+          </Grid>
+        </Grid>
+      </MKBox>
+      <MKBox width="100%" position="absolute" zIndex={2} bottom="1.625rem">
+        <SimpleFooter light />
+      </MKBox>
+    </>
+  );
+}
+
+export default SignInBasic;
