@@ -467,7 +467,7 @@ function AboutUs() {
 
         {/* 글쓰기 버튼 */}
         <div className="write-post-btn">
-            <Link to="/WP_index">
+            <Link to="/author">
               <button>글쓰기</button>
             </Link>
         </div>

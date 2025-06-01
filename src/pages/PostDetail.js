@@ -6,8 +6,8 @@ import './PostDetail.css';
 function PostDetail() {
   const { postId } = useParams();
   const [post, setPost] = useState(null);
-  const [newComment, setNewComment] = useState('');
-  const uploadBase = process.env.REACT_APP_BASE_URL; // e.g. http://localhost:8080
+  const [commentText, setNewComment] = useState('');
+  const uploadBase = process.env.REACT_APP_BASE_URL || 'http://localhost:8080'; // e.g. http://localhost:8080
 
   // 상세 정보 + 댓글 + 해시태그 + 이미지 조회
   useEffect(() => {
@@ -25,7 +25,7 @@ function PostDetail() {
   // 좋아요
   const handleLike = async () => {
     try {
-      const res = await baseAPI.post(`/community/posts/${postId}/likes`, {});
+      const res = await baseAPI.post(`/community/${postId}/like`, {}, { requiresAuth: true });
       setPost(prev => ({ ...prev, likeCount: res.data.result.likeCount }));
     } catch (err) {
       console.error('좋아요 실패', err);
@@ -35,11 +35,12 @@ function PostDetail() {
   // 댓글 등록
   const handleCommentSubmit = async e => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!commentText.trim()) return;
     try {
       const res = await baseAPI.post(
-          `/community/posts/${postId}/comments`,
-          { content: newComment }
+          `/community/${postId}/comment`,
+          { content: commentText },
+          { requiresAuth: true }
       );
       setPost(prev => ({
         ...prev,
@@ -144,7 +145,7 @@ function PostDetail() {
             <input
                 type="text"
                 placeholder="댓글을 입력하세요"
-                value={newComment}
+                value={commentText}
                 onChange={e => setNewComment(e.target.value)}
             />
             <button type="submit">등록</button>

@@ -1,3 +1,4 @@
+// Author.js
 /*
 =========================================================
 * Material Kit 2 React - v2.1.0
@@ -7,8 +8,7 @@
 * Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
 Coded by www.creative-tim.com
-
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -23,9 +23,6 @@ import MKBox from "components/MKBox";
 import DefaultNavbar from "examples/Navbars/DefaultNavbar";
 
 // Author page sections
-import Profile from "pages/LandingPages/Author/sections/Profile";
-import Posts from "pages/LandingPages/Author/sections/Posts";
-import Contact from "pages/LandingPages/Author/sections/Contact";
 import Footer from "pages/LandingPages/Author/sections/Footer";
 
 // Routes
@@ -33,6 +30,10 @@ import routes from "routes";
 
 // Images
 import bgImage from "assets/images/city-profile.jpg";
+
+// 게시글 작성 UI 컴포넌트를 가져옵니다.
+// 실제 파일 경로에 맞춰서 경로를 수정하세요.
+import WritePost from "pages/WritePost"; // 예: src/components/WritePost.js
 
 function Author() {
   return (
@@ -75,10 +76,9 @@ function Author() {
             boxShadow: ({ boxShadows: { xxl } }) => xxl,
           }}
         >
-          <Profile />
-          <Posts />
+          {/* 여기에 게시글 작성 UI 컴포넌트를 삽입 */}
+          <WritePost />
         </Card>
-        <Contact />
         <Footer />
       </MKBox>
     </>
