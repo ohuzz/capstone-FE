@@ -37,7 +37,7 @@ function SignInBasic() {
       await login({ username, password });
       // 로그인 성공 시, 토큰이 localStorage 등에 저장되었다고 가정
       console.log("로그인 성공, 받은 헤더 토큰:", localStorage.getItem("accessToken"));
-      navigate("/writepost");
+      navigate("/community");
     } catch (err) {
       console.error("로그인 실패:", err);
       alert("로그인에 실패했습니다.");

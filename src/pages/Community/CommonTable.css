@@ -1,0 +1,37 @@
+.common-table {
+    /* 전체 너비를 100%로 채웁니다. */
+    width: 100%;
+    /* 셀 사이 간격을 0으로 */
+    border-collapse: collapse;
+    /* (대신 border-spacing: 0; 도 가능합니다.) */
+    /* 테이블 전체가 가운데가 아닌, 컨테이너 폭 그대로 사용됩니다. */
+    margin: 0;
+  }
+  
+  .common-table th,
+  .common-table td {
+    /* 헤더, 바디 공통으로 패딩을 딱 맞춰 줍니다. */
+    padding: 10px 8px;
+    /* 기본 텍스트 정렬을 가운데로 */
+    text-align: center;
+    /* 하단 경계선을 같은 색으로 통일 */
+    border-bottom: 1px solid #e8e8e8;
+    /* 높이를 대략 비슷하게 맞추려면 line-height도 지정할 수 있습니다. */
+    line-height: 1.5;
+    /* 글자 크기도 헤더와 바디가 동일해야 컬럼 너비 오차가 없습니다. */
+    font-size: 14px;
+  }
+  
+  /* 헤더만 좀 더 굵게! */
+  .common-table th {
+    font-weight: 700;
+    /* 헤더는 절대로 줄 바꿈 없이 한 줄로 */
+    white-space: nowrap;
+  }
+  
+  /* tbody tr hover 시 배경색 (선택사항) */
+  .common-table tbody tr:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  

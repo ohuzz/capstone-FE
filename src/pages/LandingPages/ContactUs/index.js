@@ -34,7 +34,7 @@ import bgImage from "assets/images/city-profile.jpg";
 // 게시글 작성 UI 컴포넌트를 가져옵니다.
 // 실제 파일 경로에 맞춰서 경로를 수정하세요.
 import WritePost from "pages/WritePost"; // 예: src/components/WritePost.js
-import PostDetail from "pages/PostDetail";
+import PostDetail from "pages/bPostDetail";
 
 function Author() {
   return (

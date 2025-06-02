@@ -1,17 +1,7 @@
-/*
-=========================================================
-* Material Kit 2 React - v2.1.0
-=========================================================
+// src/pages/Presentation/index.js
 
-* Product Page: https://www.creative-tim.com/product/material-kit-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+import React from "react";
+import { Link } from "react-router-dom";
 
 // @mui material components
 import Container from "@mui/material/Container";
@@ -21,14 +11,13 @@ import Card from "@mui/material/Card";
 // Material Kit 2 React components
 import MKBox from "components/MKBox";
 import MKTypography from "components/MKTypography";
-import MKSocialButton from "components/MKSocialButton";
+import MKButton from "components/MKButton";
 
 // Material Kit 2 React examples
 import DefaultNavbar from "examples/Navbars/DefaultNavbar";
 import DefaultFooter from "examples/Footers/DefaultFooter";
-import FilledInfoCard from "examples/Cards/InfoCards/FilledInfoCard";
 
-// Presentation page sections
+// Presentation page sections (필요 없으면 지워도 됩니다)
 import Counters from "pages/Presentation/sections/Counters";
 import Information from "pages/Presentation/sections/Information";
 import DesignBlocks from "pages/Presentation/sections/DesignBlocks";
@@ -36,7 +25,7 @@ import Pages from "pages/Presentation/sections/Pages";
 import Testimonials from "pages/Presentation/sections/Testimonials";
 import Download from "pages/Presentation/sections/Download";
 
-// Presentation page components
+// Presentation page components (필요 없으면 지워도 됩니다)
 import BuiltByDevelopers from "pages/Presentation/components/BuiltByDevelopers";
 
 // Routes
@@ -44,7 +33,7 @@ import routes from "../../routes";
 import footerRoutes from "../../footer.routes";
 
 // Images
-import bgImage from "assets/images/bg-presentation.jpg";
+import bgImage from "assets/images/mainimg.jpg";
 
 // Context
 import { useAuth } from "context/AuthContext";
@@ -63,6 +52,8 @@ function Presentation() {
         }}
         sticky
       />
+
+      {/* ── 헤더 배너 영역 ── */}
       <MKBox
         minHeight="75vh"
         width="100%"
@@ -75,150 +66,177 @@ function Presentation() {
         }}
       >
         <Container>
-          <Grid container item xs={12} lg={7} justifyContent="center" mx="auto">
-            <MKTypography
-              variant="h1"
-              color="white"
-              mt={-6}
-              mb={1}
-              sx={({ breakpoints, typography: { size } }) => ({
-                [breakpoints.down("md")]: {
-                  fontSize: size["3xl"],
-                },
-              })}
-            >
-              Material Kit 2 React{" "}
-            </MKTypography>
-            <MKTypography
-              variant="body1"
-              color="white"
-              textAlign="center"
-              px={{ xs: 6, lg: 12 }}
-              mt={1}
-            >
-              Free & Open Source Web UI Kit built over ReactJS &amp; MUI. Join over 1.6 million
-              developers around the world.
-            </MKTypography>
+          {/* 외부 Grid: container 속성으로 자식 아이템들을 중앙 정렬 */}
+          <Grid container justifyContent="center">
+            {/* 내부 Grid: xs=12, lg=7, textAlign="center"으로 텍스트 중앙 정렬 */}
+            <Grid item xs={12} lg={7} sx={{ textAlign: "center" }}>
+              <MKTypography
+                variant="h1"
+                // color="info"
+                mt={-6}
+                mb={1}
+                sx={({ breakpoints, typography: { size } }) => ({
+                  [breakpoints.down("md")]: {
+                    fontSize: size["3xl"],
+                  },
+                })}
+              >
+                MODAC
+              </MKTypography>
+
+              <MKTypography
+                variant="h4"
+                component="p"
+                // color="info"
+                mt={1}
+                sx={{
+                  mx: { xs: 2, lg: 0 },
+                }}
+              >
+                “모발 이식, 이젠 데이터를 믿으세요.”
+              </MKTypography>
+
+              <MKTypography
+                variant="h6"
+                component="p"
+                // color="info"
+                mt={2}
+                sx={{
+                  mx: { xs: 2, lg: 0 },
+                }}
+              >
+                MODAC은 빅데이터 기반 예측 엔진과 사용자의 실제 후기를 결합한 탈모 커뮤니티입니다.  
+                가상 시뮬레이션으로 나에게 딱 맞는 이식 계획을 세워보고,  
+                수많은 시술 경험담을 통해 믿을 만한 정보를 찾아보세요.
+              </MKTypography>
+            </Grid>
           </Grid>
         </Container>
       </MKBox>
+
+      {/* ── Card 영역 (AI 체험 + 추천 영상) ── */}
       <Card
         sx={{
           p: 2,
           mx: { xs: 2, lg: 3 },
-          mt: -8,
+          mt: -10,
           mb: 4,
-          backgroundColor: ({ palette: { white }, functions: { rgba } }) => rgba(white.main, 0.8),
+          backgroundColor: ({ palette: { white }, functions: { rgba } }) =>
+            rgba(white.main, 0.8),
           backdropFilter: "saturate(200%) blur(30px)",
           boxShadow: ({ boxShadows: { xxl } }) => xxl,
         }}
       >
-        <Counters />
-        <Information />
-        <DesignBlocks />
-        <Pages />
-        <Container sx={{ mt: 6 }}>
-          <BuiltByDevelopers />
-        </Container>
-        <Container>
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={4}>
-              <FilledInfoCard
-                variant="gradient"
-                color="info"
-                icon="flag"
-                title="Getting Started"
-                description="Check the possible ways of working with our product and the necessary files for building your own project."
-                action={{
-                  type: "external",
-                  route: "https://www.creative-tim.com/learning-lab/react/overview/material-kit/",
-                  label: "Let's start",
-                }}
-              />
+        {/* 1) AI 모발 이식 체험 섹션 */}
+        <MKBox textAlign="center" py={4}>
+          <MKTypography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+            AI 모발 이식 체험
+          </MKTypography>
+          <MKTypography variant="body1" sx={{ color: "text.secondary", mb: 3 }}>
+            AI 기반 시뮬레이션으로 시술 후 모습을 미리 확인해보세요.
+          </MKTypography>
+          <MKButton
+            component={Link}
+            to="/ai-predict"
+            variant="gradient"
+            color="info"
+            size="large"
+          >
+            AI 체험하기
+          </MKButton>
+        </MKBox>
+
+        {/* 2) 추천 유튜브 영상 섹션 */}
+        <MKBox pt={4} pb={2}>
+          <MKTypography variant="h5" sx={{ fontWeight: 700, textAlign: "center", mb: 3 }}>
+            추천 영상
+          </MKTypography>
+          <Grid container spacing={2} justifyContent="center">
+            {/* 첫 번째 영상 */}
+            <Grid item xs={12} sm={6} md={4}>
+              {/* Wrap in a flex column to center both image and text */}
+              <MKBox sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <MKBox
+                  component="a"
+                  href="https://youtu.be/keekX8r5apQ?si=yuFXQ1G5wpMxt0o4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: "none", width: "60%" }}
+                >
+                  <MKBox
+                    component="img"
+                    src="https://img.youtube.com/vi/keekX8r5apQ/sddefault.jpg"
+                    alt="모발 이식 과정"
+                    sx={{
+                      width: "100%",
+                      borderRadius: 2,
+                      boxShadow: ({ boxShadows: { md } }) => md,
+                    }}
+                  />
+                </MKBox>
+                <MKTypography variant="subtitle1" sx={{ mt: 1, textAlign: "center" }}>
+                  모발 이식 과정
+                </MKTypography>
+              </MKBox>
             </Grid>
-            <Grid item xs={12} lg={4}>
-              <FilledInfoCard
-                color="info"
-                icon="precision_manufacturing"
-                title="Plugins"
-                description="Get inspiration and have an overview about the plugins that we used to create the Material Kit."
-                action={{
-                  type: "external",
-                  route: "https://www.creative-tim.com/learning-lab/react/overview/datepicker/",
-                  label: "Read more",
-                }}
-              />
+
+            {/* 두 번째 영상 */}
+            <Grid item xs={12} sm={6} md={4}>
+              <MKBox sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <MKBox
+                  component="a"
+                  href="https://youtu.be/kXl6KvbAzD4?si=N_k6tD-24OPjXUPr"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: "none", width: "60%" }}
+                >
+                  <MKBox
+                    component="img"
+                    src="https://img.youtube.com/vi/kXl6KvbAzD4/sddefault.jpg"
+                    alt="시술 전후 비교"
+                    sx={{
+                      width: "100%",
+                      borderRadius: 2,
+                      boxShadow: ({ boxShadows: { md } }) => md,
+                    }}
+                  />
+                </MKBox>
+                <MKTypography variant="subtitle1" sx={{ mt: 1, textAlign: "center" }}>
+                  시술 전후 비교
+                </MKTypography>
+              </MKBox>
             </Grid>
-            <Grid item xs={12} lg={4}>
-              <FilledInfoCard
-                color="info"
-                icon="apps"
-                title="Components"
-                description="Material Kit is giving you a lot of pre-made components, that will help you to build UI's faster."
-                action={{
-                  type: "external",
-                  route: "https://www.creative-tim.com/learning-lab/react/alerts/material-kit/",
-                  label: "Read more",
-                }}
-              />
+
+            {/* 세 번째 영상 */}
+            <Grid item xs={12} sm={6} md={4}>
+              <MKBox sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <MKBox
+                  component="a"
+                  href="https://youtu.be/p-EjqCxNGXk?si=0y0SRkrO2q1huigc"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: "none", width: "60%" }}
+                >
+                  <MKBox
+                    component="img"
+                    src="https://img.youtube.com/vi/p-EjqCxNGXk/sddefault.jpg"
+                    alt="전문가 인터뷰"
+                    sx={{
+                      width: "100%",
+                      borderRadius: 2,
+                      boxShadow: ({ boxShadows: { md } }) => md,
+                    }}
+                  />
+                </MKBox>
+                <MKTypography variant="subtitle1" sx={{ mt: 1, textAlign: "center" }}>
+                  전문가 인터뷰
+                </MKTypography>
+              </MKBox>
             </Grid>
           </Grid>
-        </Container>
-        <Testimonials />
-        <Download />
-        <MKBox pt={18} pb={6}>
-          <Container>
-            <Grid container spacing={3}>
-              <Grid item xs={12} lg={5} ml="auto" sx={{ textAlign: { xs: "center", lg: "left" } }}>
-                <MKTypography variant="h4" fontWeight="bold" mb={0.5}>
-                  Thank you for your support!
-                </MKTypography>
-                <MKTypography variant="body1" color="text">
-                  We deliver the best web products
-                </MKTypography>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                lg={5}
-                my={{ xs: 5, lg: "auto" }}
-                mr={{ xs: 0, lg: "auto" }}
-                sx={{ textAlign: { xs: "center", lg: "right" } }}
-              >
-                <MKSocialButton
-                  component="a"
-                  href="https://twitter.com/intent/tweet?text=Check%20Material%20Design%20System%20made%20by%20%40CreativeTim%20%23webdesign%20%23designsystem%20%23mui5&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fmaterial-kit-react"
-                  target="_blank"
-                  color="twitter"
-                  sx={{ mr: 1 }}
-                >
-                  <i className="fab fa-twitter" />
-                  &nbsp;Tweet
-                </MKSocialButton>
-                <MKSocialButton
-                  component="a"
-                  href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/material-kit-react"
-                  target="_blank"
-                  color="facebook"
-                  sx={{ mr: 1 }}
-                >
-                  <i className="fab fa-facebook" />
-                  &nbsp;Share
-                </MKSocialButton>
-                <MKSocialButton
-                  component="a"
-                  href="https://www.pinterest.com/pin/create/button/?url=https://www.creative-tim.com/product/material-kit-react"
-                  target="_blank"
-                  color="pinterest"
-                >
-                  <i className="fab fa-pinterest" />
-                  &nbsp;Pin it
-                </MKSocialButton>
-              </Grid>
-            </Grid>
-          </Container>
         </MKBox>
       </Card>
+
       <MKBox pt={6} px={1} mt={6}>
         <DefaultFooter content={footerRoutes} />
       </MKBox>
