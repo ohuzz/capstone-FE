@@ -463,6 +463,6 @@ function WritePost() {
       </MKBox>
     </>
   );
-}
+} 
 
 export default WritePost;

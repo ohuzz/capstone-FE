@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { baseAPI } from "../../apis/instance";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 // @mui material components
 import Container from "@mui/material/Container";
@@ -11,12 +11,9 @@ import MenuItem from "@mui/material/MenuItem";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Icon from "@mui/material/Icon";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 
 // Material Kit 2 React components
 import MKBox from "components/MKBox";
@@ -39,9 +36,6 @@ import bgImage from "assets/images/bg-about-us.jpg";
 import "../Community.css";
 import "./CommonTable.css"
 
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-
 // 카테고리
 const categoryMap = {
   ALOPECIA_AREATA: "원형탈모",
@@ -52,28 +46,39 @@ const categoryMap = {
 };
 
 // 성별
-const genderOptions = [
-  { label: "전체", value: "" },
-  { label: "남성", value: "MALE" },
-  { label: "여성", value: "FEMALE" },
-];
+const genderMap = {
+  MALE: "남자",
+  FEMALE: "여자",
+};
+
 
 // 모발이식량
-const transplantOptions = [
-  { label: "전체", value: "" },
-  { label: "1000모", value: "1000" },
-  { label: "2000모", value: "2000" },
-  { label: "3000모", value: "3000" },
-  { label: "4000모", value: "4000" },
-];
+const transplantMap = {
+  1000: { label: "1000모", goe: 1000, loe: 2000 },
+  2000: { label: "2000모", goe: 2000, loe: 3000 },
+  3000: { label: "3000모", goe: 3000, loe: 4000 },
+  4000: { label: "4000모", goe: 4000, loe: 5000 },
+};
+
+const transplantOptions = Object.entries(transplantMap).map(
+  ([value, { label }]) => ({ value, label })
+);
 // —————————————————————————————————————————————————
 
 function Community() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPage = parseInt(searchParams.get("page") ?? "0", 10);
+  const initialCategory = searchParams.get("category") ?? "";
+  const initialGender = searchParams.get("gender") ?? "";
+  const initialTransplantCount = searchParams.get("transplantCount") ?? "";
+  const initialSort = searchParams.get("sort") ?? "createdDate,desc";
+
   // ── 드롭다운 anchor 관리 (카테고리, 성별, 모량)
   const [catAnchor, setCatAnchor] = useState(null);
   const [genderAnchor, setGenderAnchor] = useState(null);
   const [amountAnchor, setAmountAnchor] = useState(null);
-
   const openCat = ({ currentTarget }) => setCatAnchor(currentTarget);
   const closeCat = () => setCatAnchor(null);
   const openGender = ({ currentTarget }) => setGenderAnchor(currentTarget);
@@ -101,74 +106,94 @@ function Community() {
   };
 
   // ── 상태 정의
-  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const [category, setCategory] = useState("");
-  const [gender, setGender] = useState(""); 
-  const [transplantCount, setTransplantCount] = useState("");
-  const [page, setPage] = useState(0);
+  const [category, setCategory] = useState(initialCategory);
+  const [gender, setGender] = useState(initialGender); 
+  const [transplantCount, setTransplantCount] = useState(initialTransplantCount);
+  const [page, setPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState("createdDate.desc");
-  const activeTab = sort === "likesCount.desc" ? 1 : 0;
+  const [allPosts, setAllPosts] = useState([]); 
+  const [pageSize, setPageSize] = useState(10);
+
+  const [sort, setSort] = useState(initialSort);
+  const activeTab = sort === "likesCount,desc" ? 1 : 0;
 
   // ── 탭 변경 시: 정렬 기준(sort)만 바꾸고 페이지 넘버는 0으로 초기화
-  const handleTabChange = (event, newValue) => {
-    setSort(newValue === 0 ? "createdDate.desc" : "likesCount.desc");
+  const handleTabChange = (e, v) => {
+    setSort(v === 0 ? "createdDate,desc" : "likesCount,desc");
     setPage(0);
   };
 
   // ── 글 목록을 서버에서 가져오는 함수 (페이징, 필터, 정렬 모두 API에 위임)
   const fetchPosts = useCallback(async () => {
     try {
+      // 1) 필터·페이징·정렬 파라미터 준비
       const params = {
-        category: category || undefined,
-        gender: gender || undefined, 
+        ...(category && { category: categoryMap[category] }),
+        ...(gender   && { gender:   genderMap[gender]   }),
         page,
-        order: "createdDate.desc",
+        size: pageSize,
+        sort,
       };
-
-      // 2) 모발이식량 필터가 있으면 goe/loe 형태로 넘겨준다
+  
       if (transplantCount) {
         const base = Number(transplantCount);
         params.goe = base;
         params.loe = base + 1000;
       }
-
+  
+      // 2) 서버 호출
       const res = await baseAPI.get("/community/posts", { params });
       const content = res.data.result?.content || [];
-      const total = res.data.result?.totalPages ?? 1;
-
-      // 3) 화면에 뿌릴 데이터만 가공
+      const total = res.data.result?.totalPages || 1;
+  
+      // 3) 화면용 데이터 매핑
       const data = content.map((p) => ({
-        postId: p.postId,
+        postId:  p.postId,
         category: categoryMap[p.category] || p.category,
-        title: p.title,
+        title:    p.title,
         username: p.username,
-        date: p.date,
-        likes: p.likes,
+        date:     p.date,
+        likes:    p.likes,
       }));
-
-
-      if (sort === "likesCount.desc") {
-        data.sort((a, b) => b.likes - a.likes);
-      } else {
-        data.sort((a, b) => new Date(b.date) - new Date(a.date));
-      }
-
+  
+      // 4) 상태 업데이트
       setPosts(data);
       setTotalPages(total);
+  
     } catch (err) {
       console.error("게시글 목록 불러오기 실패", err);
     }
-  }, [category, gender, transplantCount, page, sort]);
+  }, [category, gender, transplantCount, page, sort, pageSize]);
+  
+  
+  // allPosts가 바뀌거나 page가 바뀔 때마다
+  useEffect(() => {
+    const start = page * pageSize;
+    const slice = allPosts.slice(start, start + pageSize);
+    setPosts(slice);
+  }, [allPosts, page, pageSize]);
+
+
+
 
   // ── 컴포넌트 마운트 혹은 의존값 변경 시 글 목록 재요청
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
 
+  useEffect(() => {
+    const params= { page: String(page) };
+    if (category)         params.category       = category;
+    if (gender)           params.gender         = gender;
+    if (transplantCount)  params.transplantCount = transplantCount;
+    if (sort)             params.sort           = sort;
+    setSearchParams(params);
+  }, [page, category, gender, transplantCount, sort, setSearchParams]);
+
   const handleSearch = () => {
     setPage(0);
+    fetchPosts();
   };
 
   return (
@@ -293,8 +318,8 @@ function Community() {
             },
           }}
         >
-          {/* 현재 선택된 gender 값에 매핑된 label을 보여주거나, 선택 안 됐으면 “성별” */}
-          {genderOptions.find((opt) => opt.value === gender)?.label || "성별"}
+          {/* 현재 선택된 category 값에 매핑된 라벨을 보여주거나, 선택 안 됐으면 “카테고리” */}
+          {gender ? genderMap[gender] : "성별"}
         </MKButton>
         <Menu
           anchorEl={genderAnchor}
@@ -302,10 +327,13 @@ function Community() {
           onClose={closeGender}
           PaperProps={{ sx: { color: "rgba(0,0,0,0.87)" } }}
         >
-          {genderOptions.map(({ label, value }) => (
+          <MenuItem onClick={() => { setGender(""); closeGender(); }} sx={{ color: "rgba(0,0,0,0.87)" }}>
+            전체
+          </MenuItem>
+          {Object.entries(genderMap).map(([key, label]) => (
             <MenuItem
-              key={value}
-              onClick={() => { setGender(value); closeGender(); }}
+              key={key}
+              onClick={() => { setGender(key); closeGender(); }}
               sx={{ color: "rgba(0,0,0,0.87)" }}
             >
               {label}
@@ -327,7 +355,7 @@ function Community() {
           }}
         >
           {/* 현재 선택된 transplantCount 값에 매핑된 label을 보여주거나, 선택 안 됐으면 “모발이식량” */}
-          {transplantOptions.find((opt) => opt.value === transplantCount)?.label || "모발이식량"}
+          {transplantOptions.find(o => o.value === transplantCount)?.label || "모발이식량"}
         </MKButton>
         <Menu
           anchorEl={amountAnchor}
@@ -335,7 +363,13 @@ function Community() {
           onClose={closeAmount}
           PaperProps={{ sx: { color: "rgba(0,0,0,0.87)" } }}
         >
-          {transplantOptions.map(({ label, value }) => (
+        <MenuItem
+          onClick={() => { setTransplantCount(""); closeAmount(); }}
+          sx={{ color: "rgba(0,0,0,0.87)" }}
+        >
+        전체
+        </MenuItem>
+          {transplantOptions.map(({ value, label }) => (
             <MenuItem
               key={value}
               onClick={() => { setTransplantCount(value); closeAmount(); }}
@@ -393,7 +427,12 @@ function Community() {
                 <tr
                   key={post.postId}
                   onClick={() =>
-                    navigate(`/community/${post.postId}`, {
+                    navigate(
+                      {
+                        pathname: `/community/${post.postId}`,
+                        search: location.search,
+                      },
+                      {
                       state: { date: post.date },
                     })
                   }
@@ -402,7 +441,9 @@ function Community() {
                   <td style={{ width: "20%" }}>{post.category}</td>
                   <td style={{ width: "20%", textAlign: "left" }}>
                     <Link
-                      to={`/community/${post.postId}`}
+                      to={{pathname: `/community/${post.postId}`,
+                      search: location.search,
+                      }}
                       state={{ date: post.date }}
                       style={{ textDecoration: "none", color: "inherit" }}
                     >
@@ -433,7 +474,7 @@ function Community() {
                 disabled={page === 0}
                 onClick={() => setPage((p) => Math.max(p - 1, 0))}
               >
-                <Icon>keyboard_arrow_left</Icon>
+                <ChevronLeftIcon />
               </MKPagination>
               {[...Array(totalPages)].map((_, i) => (
                 <MKPagination key={i} item active={i === page} onClick={() => setPage(i)}>
@@ -445,7 +486,7 @@ function Community() {
                 disabled={page + 1 === totalPages}
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
               >
-                <Icon>keyboard_arrow_right</Icon>
+                <ChevronRightIcon />
               </MKPagination>
             </MKPagination>
           </Grid>

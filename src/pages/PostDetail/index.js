@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLoaderData, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLoaderData, useLocation, useSearchParams } from "react-router-dom";
 import { baseAPI } from "../../apis/instance";
 
 // @mui material components
@@ -40,7 +40,7 @@ function PostDetail() {
   const [showModal, setShowModal] = useState(false);
   const uploadBase = process.env.REACT_APP_BASE_URL || "http://localhost:8080";
   const location = useLocation();
-
+  const [searchParams] = useSearchParams();
   // 상세 정보 + 댓글 + 해시태그 + 이미지 조회
   useEffect(() => {
     async function fetchDetail() {
@@ -61,7 +61,7 @@ function PostDetail() {
   const handleClose = () => {
     setShowModal(false);
     setTimeout(() => {
-      navigate("/community");
+      navigate(`/community${location.search}`);
     }, 300);
   };
 
